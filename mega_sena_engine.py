@@ -4,34 +4,38 @@ import numpy as np
 MIN_GUESS_NUMBERS = 6
 MAX_UNIT_NUMBER = 60
 
+
 class Sorteio(object):
-	def __init__(self,id,premio,n1,n2,n3,n4,n5,n6):
-		self.id = id
-		self.premio = premio
-		self.numeros = np.array([n1,n2,n3,n4,n5,n6])
+    def __init__(self,id,premio,n1,n2,n3,n4,n5,n6):
+        self.id = id
+        self.premio = premio
+        self.numeros = np.array([n1,n2,n3,n4,n5,n6])
 
-	def comparar(self,aposta):
-		iguais = 0
-		for n in aposta:
-			if n in self.numeros:
-				iguais += 1
-		return iguais
-		
+    def comparar(self,aposta):
+        iguais = 0
+        for n in aposta:
+            if n in self.numeros:
+                iguais += 1
+        return iguais
+
+
 def carregar_sorteios(file):
-	with open(file, 'r') as csvfile:
-		reader = csv.reader(csvfile,quotechar="'")
-		sorteios = [Sorteio(int(row[0]),float(row[8].replace('.','').replace(',','.')),*[int(row[i]) for i in range(2,8)]) for row in reader]
-		return sorteios
-		
-def gerar_data_sets(sorteios):
-	for i in range(1,len(sorteios)):
-		yield sorteios[:i],sorteios[i]
+    with open(file, 'r') as csvfile:
+        reader = csv.reader(csvfile,quotechar="'")
+        sorteios = [Sorteio(int(row[0]),float(row[8].replace('.','').replace(',','.')),*[int(row[i]) for i in range(2,8)]) for row in reader]
+        return sorteios
 
-def simulate(sorteios, funcao_jogo):
+
+def gerar_data_sets(sorteios):
+    for i in range(1,len(sorteios)):
+        yield sorteios[:i],sorteios[i]
+
+
+def simulate(sorteios, prediction):
     guesses_counter_list = [0 for i in range(0, MIN_GUESS_NUMBERS + 1)]
 
     for historico, atual in gerar_data_sets(sorteios):
-        guesses_counter_list[atual.comparar(funcao_jogo(historico, MIN_GUESS_NUMBERS))] += 1
+        guesses_counter_list[atual.comparar(prediction.run(historico, MIN_GUESS_NUMBERS))] += 1
 
     for i in reversed(range(1, MIN_GUESS_NUMBERS + 1)):
         print 'Wins with %d guesses: %d/%d | Probability: %.2f%%' % (i,
@@ -40,5 +44,7 @@ def simulate(sorteios, funcao_jogo):
                                                                 100.0 * float(guesses_counter_list[i]) / float(len(sorteios) - 1)
                                                                 )
 
+
 def make_guess(sorteios, guesses_number, func):
     guess_list = func(sorteios, guesses_number)
+    return guess_list
