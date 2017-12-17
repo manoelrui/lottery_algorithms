@@ -48,4 +48,4 @@ algorithm_list = [random, most_frequent, less_frequent, most_and_less_frequent]
 for f in algorithm_list:
     print "Algorithm: %s" % f.__name__
     simulate(sorteios, f)
-    print "\n"
+    print ""
