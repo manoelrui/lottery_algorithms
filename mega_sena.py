@@ -78,7 +78,7 @@ class TrendsWithRadomPred(PredictiveModel):
             self.updateHistogram(historic[-1])
 
         guess_list = sorted(self.histogram, key=lambda tup: tup[1], reverse=True)
-        guess_list = guess_list[0:guesses_number] + guess_list[-guesses_number:] + [choice(guess_list) for i in xrange(0, 15)]
+        guess_list = guess_list[0:guesses_number] + guess_list[-guesses_number:] + [choice(guess_list) for i in xrange(0, guesses_number)]
         shuffle(guess_list)
 
         return np.array([guess_list[i][0] for i in range(0, guesses_number)])
