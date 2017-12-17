@@ -31,14 +31,14 @@ def gerar_data_sets(sorteios):
         yield sorteios[:i],sorteios[i]
 
 
-def simulate(sorteios, prediction):
+def simulate(sorteios, prediction, extra_numbers = 0):
     guesses_counter_list = [0 for i in range(0, MIN_GUESS_NUMBERS + 1)]
 
     for historico, atual in gerar_data_sets(sorteios):
-        guess_list = prediction.run(historico, MIN_GUESS_NUMBERS, False)
+        guess_list = prediction.run(historico, MIN_GUESS_NUMBERS + extra_numbers, False)
         guesses_counter_list[atual.comparar(guess_list)] += 1
 
-    guess_list = prediction.run(historico, MIN_GUESS_NUMBERS, True)
+    guess_list = prediction.run(historico, MIN_GUESS_NUMBERS + extra_numbers, True)
     print 'Guess: %s' % guess_list
     for i in reversed(range(1, MIN_GUESS_NUMBERS + 1)):
         print 'Wins with %d guesses: %d/%d | Probability: %.2f%%' % (i,

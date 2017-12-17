@@ -1,5 +1,5 @@
 from mega_sena_engine import *
-from random import shuffle
+from random import shuffle, choice
 import abc
 
 
@@ -68,8 +68,24 @@ class MostAndLessFrequentPred(PredictiveModel):
         return np.array([guess_list[i][0] for i in range(0, guesses_number)])
 
 
+class TrendsWithRadomPred(PredictiveModel):
+    def run(self, historic, guesses_number, get_all_hist):
+        if (get_all_hist):
+            self.reset_histogram()
+            for lottery_draw in historic:
+                self.updateHistogram(lottery_draw)
+        else:
+            self.updateHistogram(historic[-1])
+
+        guess_list = sorted(self.histogram, key=lambda tup: tup[1], reverse=True)
+        guess_list = guess_list[0:guesses_number] + guess_list[-guesses_number:] + [choice(guess_list) for i in xrange(0, 15)]
+        shuffle(guess_list)
+
+        return np.array([guess_list[i][0] for i in range(0, guesses_number)])
+
+
 sorteios = carregar_sorteios('sena_parsed.csv')
-algorithm_list = [RandomPred(), MostFrequentPred(), LessFrequentPred(), MostAndLessFrequentPred()]
+algorithm_list = [RandomPred(), MostFrequentPred(), LessFrequentPred(), MostAndLessFrequentPred(), TrendsWithRadomPred()]
 
 for prediction in algorithm_list:
     print "Algorithm: %s" % prediction.__class__.__name__
