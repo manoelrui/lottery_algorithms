@@ -2,6 +2,7 @@ import csv
 import numpy as np
 
 MAX_GUESS_NUMBERS = 6
+MAX_UNIT_NUMBER = 60
 
 class Sorteio(object):
 	def __init__(self,id,premio,n1,n2,n3,n4,n5,n6):
