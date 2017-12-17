@@ -1,6 +1,7 @@
 import csv
 import numpy as np
 
+MAX_GUESS_NUMBERS = 6
 
 class Sorteio(object):
 	def __init__(self,id,premio,n1,n2,n3,n4,n5,n6):
@@ -26,16 +27,14 @@ def gerar_data_sets(sorteios):
 		yield sorteios[:i],sorteios[i]
 
 def jogar(sorteios, funcao_jogo):
-	sorteios_ganhos_6 = 0
-	sorteios_ganhos_5 = 0
-	sorteios_ganhos_4 = 0
-	for historico,atual in gerar_data_sets(sorteios):
-		if atual.comparar(funcao_jogo(historico)) == 6:
-			sorteios_ganhos_6 +=1
-		elif atual.comparar(funcao_jogo(historico)) == 5:
-			sorteios_ganhos_5 +=1
-		elif atual.comparar(funcao_jogo(historico)) == 4:
-			sorteios_ganhos_4 +=1
-	print 'Sorteios ganhos 4: %s' % sorteios_ganhos_4
-	print 'Sorteios ganhos 5: %s' % sorteios_ganhos_5
-	print 'Sorteios ganhos 6: %s' % sorteios_ganhos_6
+    guesses_counter_list = [0 for i in range(0, MAX_GUESS_NUMBERS + 1)]
+
+    for historico, atual in gerar_data_sets(sorteios):
+        guesses_counter_list[atual.comparar(funcao_jogo(historico))] += 1
+
+    for i in reversed(range(1, MAX_GUESS_NUMBERS + 1)):
+        print 'Wins with %d guesses: %d/%d | Probability: %.2f%%' % (i,
+                                                                guesses_counter_list[i],
+                                                                len(sorteios) - 1,
+                                                                100.0 * float(guesses_counter_list[i]) / float(len(sorteios) - 1)
+                                                                )
