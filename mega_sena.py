@@ -69,6 +69,10 @@ class MostAndLessFrequentPred(PredictiveModel):
 
 
 class TrendsWithRadomPred(PredictiveModel):
+    def __init__(self):
+        self.sample_len = 6
+        super(TrendsWithRadomPred, self).__init__()
+
     def run(self, historic, guesses_number, get_all_hist):
         if (get_all_hist):
             self.reset_histogram()
@@ -78,15 +82,25 @@ class TrendsWithRadomPred(PredictiveModel):
             self.updateHistogram(historic[-1])
 
         guess_list = sorted(self.histogram, key=lambda tup: tup[1], reverse=True)
-        guess_list = guess_list[0:guesses_number] + guess_list[-guesses_number:] + [choice(guess_list) for i in xrange(0, guesses_number)]
-        shuffle(guess_list)
+        guess_list = guess_list[0:guesses_number] + guess_list[-guesses_number:]
+        final_guess_list = [guess_list[i][0] for i in range(0, len(guess_list))]
 
-        return np.array([guess_list[i][0] for i in range(0, guesses_number)])
+        sample_counter = self.sample_len
+        while sample_counter > 0:
+            random_tuple = choice(self.histogram)
+            if not int(random_tuple[0]) in final_guess_list:
+                final_guess_list.append(random_tuple[0])
+                sample_counter -= 1
+
+        shuffle(final_guess_list)
+
+        return np.array(final_guess_list[:guesses_number])
 
 
 sorteios = carregar_sorteios('sena_parsed.csv')
 algorithm_list = [RandomPred(), MostFrequentPred(), LessFrequentPred(), MostAndLessFrequentPred(), TrendsWithRadomPred()]
 
+print 'Number of events: %d' % len(sorteios)
 for prediction in algorithm_list:
     print "Algorithm: %s" % prediction.__class__.__name__
     simulate(sorteios, prediction)
